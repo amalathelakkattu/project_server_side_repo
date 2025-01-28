@@ -17,7 +17,7 @@ router.get("/profile", userAuth, userProfile);
 router.get("/logout", userAuth, userLogout);
 
 //profile-update
-router.patch("/updateprofile", userAuth, updateProfile);
+router.post("/updateprofile", userAuth, updateProfile);
 //forgot-password
 //change-password
 //account-deactivate

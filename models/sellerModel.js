@@ -1,6 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 
-const userSchema = new Schema({
+const sellerSchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -30,7 +30,7 @@ const userSchema = new Schema({
     role: {
         type: String,
         enum: ["admin", "seller","user"],
-        default: "user",
+        default: "seller",
     },
     profiePic: {
         type: String,
@@ -42,4 +42,4 @@ const userSchema = new Schema({
     },
 });
 
-export const User = mongoose.model("User", userSchema);
+export const seller = mongoose.model("Seller", sellerSchema);
