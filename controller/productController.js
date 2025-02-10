@@ -52,8 +52,8 @@ export const createProduct = async (req, res, next) => {
     }
 };
 
-/*
-export const createProduct = async (req, res, next) => {
+
+export const createProduct2 = async (req, res, next) => {
     try {
         const { title, description, price, quantity, brand, seller, category } = req.body;
 
@@ -88,7 +88,7 @@ export const createProduct = async (req, res, next) => {
         return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
     }
 };
-*/
+
 
 export const updateProduct = async (req, res, next) => {
     try {
