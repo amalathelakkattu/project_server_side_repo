@@ -13,7 +13,8 @@ export const getProduct = async (req, res, next) => {
 
 export const getProductDetails = async (req, res, next) => {
     try {
-        const productList = await Product.find().populate("seller");
+        const {productId} = req.params;
+        const productList = await Product.findById(productId).populate("seller");
 
         res.json({ data: productList, message: "Product Details fetched...." });
     } catch (error) {
@@ -23,33 +24,71 @@ export const getProductDetails = async (req, res, next) => {
 
 
 export const createProduct = async (req, res, next) => {
-    try {
+    try {console.log("test")
         const { title, description, price, quantity,brand, seller,category } = req.body;
         //let cloudinaryResponse
-
         if (!title || !description || !price || !quantity|| !brand|| !seller|| !category) {
             return res.status(400).json({ message: "all fileds required" });
         }
-
-        const sellerId = req.seller.id;
-        const categotyId= req.category.id
-
+        
+        const sellerId = req.user.id;
+        const categoryId = req.body.category;
         console.log("image===", req.file);
-
+        
         if(req.file){
             cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+            console.log("cldRes====", cloudinaryResponse);
+        
+        const productData = new Product({ title, description, price, quantity,brand, image: cloudinaryResponse.url, seller: sellerId,category:categoryId });
+        } else{
+            const productData = new Product({ title, description, price, quantity,brand, image, seller: sellerId,category:categoryId });
         }
-
-        console.log("cldRes====", cloudinaryResponse);
-
-        const productData = new Product({ title, description, price, quantity,brand, image: cloudinaryResponse.url, seller: sellerId,category:categotyId });
+        
         await productData.save();
-
-        res.json({ data: courseData, message: "course created successfully" });
+        
+        res.json({ data: productData, message: "Product created successfully" });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
     }
 };
+
+/*
+export const createProduct = async (req, res, next) => {
+    try {
+        const { title, description, price, quantity, brand, seller, category } = req.body;
+
+        if (!title || !description || !price || !quantity || !brand || !seller || !category) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        const sellerId = req.user ? req.user.id : seller;
+        const categoryId = category;
+
+        let cloudinaryResponse = { url: "" };
+
+        if (req.file) {
+            cloudinaryResponse = await cloudinary.uploader.upload(req.file.path);
+        }
+
+        const productData = new Product({
+            title,
+            description,
+            price,
+            quantity,
+            brand,
+            image: cloudinaryResponse.url,
+            seller: sellerId,
+            category: categoryId
+        });
+
+        await productData.save();
+
+        res.json({ data: productData, message: "Product created successfully" });
+    } catch (error) {
+        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
+    }
+};
+*/
 
 export const updateProduct = async (req, res, next) => {
     try {

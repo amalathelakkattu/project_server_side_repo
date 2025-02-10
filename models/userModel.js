@@ -24,7 +24,7 @@ const userSchema = new Schema({
     },
     address: {
         type: String,
-        required: true,
+        //required: true,
         maxLength: 50,
     },
     role: {

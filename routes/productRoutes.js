@@ -11,7 +11,7 @@ router.post("/create-product", sellerAuth, upload.single("image"), createProduct
 router.put("/update-product",sellerAuth,upload.single('image'),updateProduct);
 router.delete("/delete-product",sellerAuth,deleteProduct);
 router.get("/get-product", getProduct);
-router.get("/product-details", getProductDetails);
+router.get("/product-details/:productId", getProductDetails);
 router.get("/filter-product",productsFilter);
 router.get("/sort-product",productsSort);
 
