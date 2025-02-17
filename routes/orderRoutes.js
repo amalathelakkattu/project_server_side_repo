@@ -1,10 +1,12 @@
 import e from "express";
-import { } from "../controller/orderController.js";
+import { getOrder ,getOrderById  } from "../controller/orderController.js";
 import { userAuth } from "../middlewares/userAuth.js";
 
 const router = e.Router();
 
-//router.get("/get-cart", userAuth, getCart);
+router.get("/getorder", userAuth, getOrder);
+router.get("/getorderbyId", userAuth, getOrderById);
+
 
 
 

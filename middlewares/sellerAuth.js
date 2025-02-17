@@ -2,8 +2,12 @@ import jwt from "jsonwebtoken";
 
 export const sellerAuth = (req, res, next) => {
     try {
+        
         const { token } = req.cookies;
-
+        
+        console.log("token",token)
+        
+        
         if (!token) {
             return res.status(401).json({ message: "seller not autherised", success: false });
         }
@@ -14,7 +18,7 @@ export const sellerAuth = (req, res, next) => {
             return res.status(401).json({ message: "seller not autherised", success: false });
         }
         
-        if(tokenVerified.role != 'user' && tokenVerified.role !='admin'){
+        if(tokenVerified.role != 'seller'){
             return res.status(401).json({ message: "seller not autherised", success: false });
         }
 

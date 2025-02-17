@@ -14,7 +14,7 @@ export const adminAuth = (req, res, next) => {
             return res.status(401).json({ message: "admin not autherised", success: false });
         }
         
-        if(tokenVerified.role != 'user' && tokenVerified.role !='seller'){
+        if(tokenVerified.role != 'admin'){
             return res.status(401).json({ message: "admin not autherised", success: false });
         }
 

@@ -24,62 +24,49 @@ export const getProductDetails = async (req, res, next) => {
 
 
 export const createProduct = async (req, res, next) => {
-    try {console.log("test")
-        const { title, description, price, quantity,brand, seller,category } = req.body;
-        //let cloudinaryResponse
-        if (!title || !description || !price || !quantity|| !brand|| !seller|| !category) {
-            return res.status(400).json({ message: "all fileds required" });
-        }
-        
-        const sellerId = req.user.id;
-        const categoryId = req.body.category;
-        console.log("image===", req.file);
-        
-        if(req.file){
-            cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
-            console.log("cldRes====", cloudinaryResponse);
-        
-        const productData = new Product({ title, description, price, quantity,brand, image: cloudinaryResponse.url, seller: sellerId,category:categoryId });
-        } else{
-            const productData = new Product({ title, description, price, quantity,brand, image, seller: sellerId,category:categoryId });
-        }
-        
-        await productData.save();
-        
-        res.json({ data: productData, message: "Product created successfully" });
-    } catch (error) {
-        return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
-    }
-};
-
-
-export const createProduct2 = async (req, res, next) => {
     try {
         const { title, description, price, quantity, brand, seller, category } = req.body;
-
+        console.log("body===",req.body)
+        // Validate required fields
         if (!title || !description || !price || !quantity || !brand || !seller || !category) {
             return res.status(400).json({ message: "All fields are required" });
         }
+       
+        const sellerId = req.body.seller;
+        console.log("SellerId==",sellerId);
+        const categoryId = req.body.category;
+        console.log("CategoryID==",categoryId)
+        console.log("image===", req.file);
 
-        const sellerId = req.user ? req.user.id : seller;
-        const categoryId = category;
-
-        let cloudinaryResponse = { url: "" };
+        let productData;
 
         if (req.file) {
-            cloudinaryResponse = await cloudinary.uploader.upload(req.file.path);
-        }
+            const cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+            console.log("cldRes====", cloudinaryResponse);
 
-        const productData = new Product({
-            title,
-            description,
-            price,
-            quantity,
-            brand,
-            image: cloudinaryResponse.url,
-            seller: sellerId,
-            category: categoryId
-        });
+            productData = new Product({
+                title,
+                description,
+                price,
+                quantity,
+                brand,
+                image: cloudinaryResponse.url,
+                seller: sellerId,
+                category: categoryId
+            });
+        } else {
+            // Handle the case where no image is uploaded
+            productData = new Product({
+                title,
+                description,
+                price,
+                quantity,
+                brand,
+                image: null, // or a default image URL
+                seller: sellerId,
+                category: categoryId
+            });
+        }
 
         await productData.save();
 
@@ -92,37 +79,55 @@ export const createProduct2 = async (req, res, next) => {
 
 export const updateProduct = async (req, res, next) => {
     try {
-        const { title, description, price, quantity,brand, seller,category } = req.body;
-        //let cloudinaryResponse
-
-        if (!title || !description || !price || !quantity|| !brand|| !seller|| !category) {
-            return res.status(400).json({ message: "all fileds required" });
+        const { title, description, price, quantity, brand, seller, category } = req.body;
+        const productId = req.body.id; // Assuming the product ID is passed in the URL params
+console.log("Product.findById(productId)===",Product.findById(productId))
+        // Check if the product exists
+        const existingProduct = await Product.findById(productId);
+        console.log("existingProduct===",existingProduct)
+        if (!existingProduct) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        const sellerId = req.seller.id;
-        const categotyId= req.category.id
+        // Update fields if they are provided in the request
+        if (title) existingProduct.title = title;
+        if (description) existingProduct.description = description;
+        if (price) existingProduct.price = price;
+        if (quantity) existingProduct.quantity = quantity;
+        if (brand) existingProduct.brand = brand;
+        if (seller) existingProduct.seller = seller;
+        if (category) existingProduct.category = category;
 
-        console.log("image===", req.file);
-
-        if(req.file){
-            cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+        // Handle image upload if a new file is provided
+        if (req.file) {
+            const cloudinaryResponse = await cloudinaryInstance.uploader.upload(req.file.path);
+            existingProduct.image = cloudinaryResponse.url; // Update the image URL
         }
 
-        console.log("cldRes====", cloudinaryResponse);
+        // Save the updated product
+        await existingProduct.save();
 
-        const productData = new Product({ title, description, price, quantity,brand, image: cloudinaryResponse.url, seller: sellerId,category:categotyId });
-        await productData.save();
-
-        res.json({ data: productData, message: "Product data updated successfully" });
+        res.json({ data: existingProduct, message: "Product updated successfully" });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
     }
 };
+
+
 export const deleteProduct = async (req, res, next) => {
     try {
-        const productData = await Product.find();
-        productData.deleteProduct()
-        res.json({ message: "Product deleted..." });
+        const productId = req.body.id; // Assuming the product ID is passed in the URL params
+
+        // Check if the product exists
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // Delete the product
+        await Product.findByIdAndDelete(productId);
+
+        res.json({ message: "Product deleted successfully" });
     } catch (error) {
         return res.status(error.statusCode || 500).json({ message: error.message || "Internal server error" });
     }
@@ -172,6 +177,5 @@ export const productsSort = async (req, res, next) => {
         res.status(500).json({ message: 'Error sorting products' });
     }
 };
-
 
 

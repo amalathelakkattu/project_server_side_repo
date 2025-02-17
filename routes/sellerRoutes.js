@@ -1,5 +1,5 @@
 import e from "express";
-import { checkSeller, sellerLogin, sellerLogout, sellerProfile, sellerSignup } from "../controller/sellerController.js";
+import { checkSeller, getSellerProfile, sellerLogin, sellerLogout, sellerSignup, updateSellerProfile } from "../controller/sellerController.js";
 import { sellerAuth } from "../middlewares/sellerAuth.js";
 
 const router = e.Router();
@@ -11,15 +11,23 @@ router.post("/signup", sellerSignup);
 router.post("/login", sellerLogin);
 
 //profile
-router.get("/profile", sellerAuth, sellerProfile);
+router.get("/getprofile", sellerAuth, getSellerProfile);
+
+//profile-update
+router.put("/updateprofile", sellerAuth, updateSellerProfile);
 
 // logout
 router.put("/logout", sellerAuth, sellerLogout);
 
-//profile-update
 //forgot-password
+
+
 //change-password
+
+
 //account-deactivate
+
+
 
 //check-user
 router.get("/check-mentor", sellerAuth, checkSeller);

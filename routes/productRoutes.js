@@ -10,9 +10,9 @@ const router = e.Router();
 router.post("/create-product", sellerAuth, upload.single("image"), createProduct);
 router.put("/update-product",sellerAuth,upload.single('image'),updateProduct);
 router.delete("/delete-product",sellerAuth,deleteProduct);
-router.get("/get-product", getProduct);
-router.get("/product-details/:productId", getProductDetails);
-router.get("/filter-product",productsFilter);
-router.get("/sort-product",productsSort);
+router.get("/get-product", sellerAuth,getProduct);
+router.get("/product-details/:productId", sellerAuth,getProductDetails);
+router.get("/filter-product",sellerAuth,productsFilter);
+router.get("/sort-product",sellerAuth,productsSort);
 
 export { router as productRouter };

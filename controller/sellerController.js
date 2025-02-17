@@ -51,7 +51,7 @@ export const sellerLogin = async (req, res, next) => {
 
         const passwordMatch = bcrypt.compareSync(password, isSellerExist.password);
         if (!passwordMatch) {
-            return res.status(401).json({ message: "user not autherized" });
+            return res.status(401).json({ message: "Seller not autherized" });
         }
 
         const token = generateToken(isSellerExist._id,'seller');
@@ -65,7 +65,7 @@ export const sellerLogin = async (req, res, next) => {
 };
 
 
-export const sellerProfile = async (req, res, next) => {
+export const getSellerProfile = async (req, res, next) => {
     try {
 
         const {user}=req
@@ -76,6 +76,47 @@ export const sellerProfile = async (req, res, next) => {
     } catch (error) {
         console.log(error);
         res.status(error.statusCode || 500).json(error.message || 'Internal server error')
+    }
+};
+
+export const updateSellerProfile = async (req, res, next) => {
+    try {
+        const { name, email, phone, address, profilePic } = req.body;
+        const sellerId = req.user.id; 
+
+        // Validate input
+        if (!name || !email || !phone || !address) {
+            return res.status(400).json({ success: false, message: "All fields are required" });
+        }
+
+        // Fetch the seller by ID
+        const seller = await seller.findById(sellerId);
+        if (!seller) {
+            return res.status(404).json({ success: false, message: "Seller not found" });
+        }
+
+        // Check if the email is already taken by another seller
+        const isEmailTaken = await seller.findOne({ email, _id: { $ne: sellerId } });
+        if (isEmailTaken) {
+            return res.status(400).json({ success: false, message: "Email is already taken" });
+        }
+
+        // Update the seller profile
+        seller.name = name;
+        seller.email = email;
+        seller.phone = phone;
+        seller.address = address;
+        seller.profilePic = profilePic;
+
+        // Save the updated seller profile
+        await seller.save();
+
+        // Return the updated seller profile (excluding the password)
+        const { password, ...sellerDataWithoutPassword } = seller._doc;
+        res.json({ success: true, message: "Seller profile updated successfully", data: sellerDataWithoutPassword });
+    } catch (error) {
+        console.error("Error updating seller profile:", error);
+        res.status(500).json({ success: false, message: error.message || "Internal server error" });
     }
 };
 export const sellerLogout = async (req, res, next) => {
